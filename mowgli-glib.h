@@ -27,7 +27,7 @@
 #ifndef __MOWGLI_GLIB_H__
 #define __MOWGLI_GLIB_H__
 
-extern gboolean mowgli_glib_init(mowgli_eventloop_t *eventloop);
-extern mowgli_eventloop_t *mowgli_glib_get_eventloop(void);
+extern gboolean mowgli_glib_init(GMainLoop *mainloop, mowgli_eventloop_t *eventloop);
+extern mowgli_eventloop_t *mowgli_glib_get_eventloop(GMainLoop *mainloop);
 
 #endif

@@ -71,11 +71,13 @@ mowgli_glib_poll(GPollFD *pollfds, guint nfds, gint timeout)
 }
 
 gboolean
-mowgli_glib_init(mowgli_eventloop_t *eventloop)
+mowgli_glib_init(GMainLoop *mainloop, mowgli_eventloop_t *eventloop)
 {
 	GMainContext *main_context;
 
-	main_context = g_main_context_default();
+	return_val_if_fail(mainloop != NULL, FALSE);
+
+	main_context = g_main_loop_get_context(mainloop);
 	return_val_if_fail(main_context != NULL, FALSE);
 
 	original_pollfn = g_main_context_get_poll_func(main_context);
@@ -88,7 +90,7 @@ mowgli_glib_init(mowgli_eventloop_t *eventloop)
 }
 
 mowgli_eventloop_t *
-mowgli_glib_get_eventloop(void)
+mowgli_glib_get_eventloop(GMainLoop *mainloop)
 {
 	return base_eventloop;
 }
