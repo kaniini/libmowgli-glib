@@ -27,7 +27,6 @@ If you are adding Mowgli eventing to an already existing GLib application, use t
 following example code as a general idea of how you should go about doing it:
 
 ```C
-
 #include <mowgli-glib.h>
 #include <glib.h>
 
@@ -36,17 +35,15 @@ int main(int argc, const char *argv[])
 	GMainLoop *mainloop;
 
 	mainloop = g_main_loop_new();
-	mowgli_glib_init(mainloop);
+	mowgli_glib_init(mainloop, NULL);
 
 	g_main_loop_run(mainloop);
 }
-
 ```
 
 You can then attach Mowgli eventing primitives to it, like so:
 
 ```C
-
 static void timer_tick(gpointer unused)
 {
 	printf("timer ticked\n");
@@ -59,14 +56,13 @@ int main(int argc, const char *argv[])
 
 	mainloop = g_main_loop_new();
 
-	mowgli_glib_init(mainloop);
+	mowgli_glib_init(mainloop, NULL);
 	eventloop = mowgli_glib_get_eventloop(mainloop);
 
 	mowgli_timer_add(eventloop, "timer_tick", timer_tick, NULL, 1);
 
 	g_main_loop_run(mainloop);
 }
-
 ```
 
 This will cause timer_tick() to be called every second.  You can do the same thing
@@ -75,3 +71,6 @@ with pollables, VIO objects, etc.
 The other way is equally simple, instead of using mowgli_eventloop_run(), use
 g_main_loop_run() or some other similar wrapper after injecting mowgli into the
 eventloop.
+
+To connect GLib to an already existing eventloop, pass it to mowgli_glib_init, instead
+of NULL.
