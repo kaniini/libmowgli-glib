@@ -63,8 +63,7 @@ mowgli_glib_poll(GPollFD *pollfds, guint nfds, gint timeout)
 			mowgli_pollable_setselect(base_eventloop, pfds[i], MOWGLI_EVENTLOOP_IO_WRITE, mowgli_glib_poll_mark_writeable);
 	}
 
-	/* XXX: We need a mowgli_eventloop_timeout_once() call. */
-	mowgli_eventloop_run_once(base_eventloop);
+	mowgli_eventloop_timeout_once(base_eventloop, timeout);
 
 	for (i = 0; i < nfds; i++)
 		mowgli_pollable_destroy(base_eventloop, pfds[i]);
