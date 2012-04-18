@@ -24,8 +24,13 @@
 #include "mowgli-glib.h"
 #include "config.h"
 
-static mowgli_eventloop_t *base_eventloop = NULL;
+static mowgli_dictionary_t *mainloop_dict = NULL;
 static GPollFunc original_pollfn = NULL;
+
+static ptrdiff_t compare_pointer(const void *lhs, const void *rhs)
+{
+	return rhs - lhs;
+}
 
 /*
  * This kind of sucks, but it's better than nothing, I suppose.
@@ -50,23 +55,33 @@ mowgli_glib_poll_mark_writeable(mowgli_eventloop_t *eventloop, mowgli_eventloop_
 static gint
 mowgli_glib_poll(GPollFD *pollfds, guint nfds, gint timeout)
 {
+	GMainContext *context;
 	guint i;
 	mowgli_eventloop_pollable_t *pfds[nfds + 1];
+	mowgli_eventloop_t *eventloop;
+
+	context = g_main_context_get_thread_default();
+	if (context == NULL)
+		context = g_main_context_default();
+
+	eventloop = mowgli_dictionary_retrieve(mainloop_dict, context);
+	if (eventloop == NULL)
+		mowgli_throw_exception_fatal(mowgli.glib.UnavailableContextException);
 
 	for (i = 0; i < nfds; i++)
 	{
-		pfds[i] = mowgli_pollable_create(base_eventloop, pollfds[i].fd, &pollfds[i]);
+		pfds[i] = mowgli_pollable_create(eventloop, pollfds[i].fd, &pollfds[i]);
 
 		if (pollfds[i].events & G_IO_IN)
-			mowgli_pollable_setselect(base_eventloop, pfds[i], MOWGLI_EVENTLOOP_IO_READ, mowgli_glib_poll_mark_readable);
+			mowgli_pollable_setselect(eventloop, pfds[i], MOWGLI_EVENTLOOP_IO_READ, mowgli_glib_poll_mark_readable);
 		if (pollfds[i].events & G_IO_OUT)
-			mowgli_pollable_setselect(base_eventloop, pfds[i], MOWGLI_EVENTLOOP_IO_WRITE, mowgli_glib_poll_mark_writeable);
+			mowgli_pollable_setselect(eventloop, pfds[i], MOWGLI_EVENTLOOP_IO_WRITE, mowgli_glib_poll_mark_writeable);
 	}
 
-	mowgli_eventloop_timeout_once(base_eventloop, timeout);
+	mowgli_eventloop_timeout_once(eventloop, timeout);
 
 	for (i = 0; i < nfds; i++)
-		mowgli_pollable_destroy(base_eventloop, pfds[i]);
+		mowgli_pollable_destroy(eventloop, pfds[i]);
 }
 
 gboolean
@@ -82,14 +97,28 @@ mowgli_glib_init(GMainLoop *mainloop, mowgli_eventloop_t *eventloop)
 	original_pollfn = g_main_context_get_poll_func(main_context);
 	g_main_context_set_poll_func(main_context, mowgli_glib_poll);
 
-	if (eventloop)
-		base_eventloop = eventloop;
-	else
-		base_eventloop = mowgli_eventloop_create();
+	if (eventloop == NULL)
+		eventloop = mowgli_eventloop_create();
+
+	/* we have to do this because glib doesn't allow you to attach data to a GMainContext */
+	if (mainloop_dict == NULL)
+		mainloop_dict = mowgli_dictionary_create(compare_pointer);
+
+	mowgli_dictionary_add(mainloop_dict, main_context, eventloop);
+
+	/* associate our GMainContext with our eventloop. */
+	mowgli_eventloop_set_data(eventloop, main_context);
 }
 
 mowgli_eventloop_t *
 mowgli_glib_get_eventloop(GMainLoop *mainloop)
 {
-	return base_eventloop;
+	GMainContext *main_context;
+
+	return_val_if_fail(mainloop != NULL, NULL);
+
+	main_context = g_main_loop_get_context(mainloop);
+	return_val_if_fail(main_context != NULL, NULL);
+
+	return mowgli_dictionary_retrieve(mainloop_dict, main_context);
 }
