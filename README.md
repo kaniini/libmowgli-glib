@@ -69,9 +69,5 @@ int main(int argc, const char *argv[])
 This will cause timer_tick() to be called every second.  You can do the same thing
 with pollables, VIO objects, etc.
 
-The other way is equally simple, instead of using mowgli_eventloop_run(), use
-g_main_loop_run() or some other similar wrapper after injecting mowgli into the
-eventloop.
-
 To connect GLib to an already existing eventloop, pass it to mowgli_glib_init, instead
 of NULL.
