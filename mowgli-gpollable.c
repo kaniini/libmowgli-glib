@@ -82,6 +82,15 @@ mowgli_glib_poll(GPollFD *pollfds, guint nfds, gint timeout)
 
 	for (i = 0; i < nfds; i++)
 		mowgli_pollable_destroy(eventloop, pfds[i]);
+
+	/* allow breaking the GMainLoop using mowgli_eventloop_break() */
+	if (eventloop->death_requested)
+	{
+		GMainLoop *mainloop = mowgli_eventloop_get_data(eventloop);
+		g_main_loop_quit(mainloop);
+	}
+
+	return nfds;
 }
 
 gboolean
@@ -106,8 +115,8 @@ mowgli_glib_init(GMainLoop *mainloop, mowgli_eventloop_t *eventloop)
 
 	mowgli_dictionary_add(mainloop_dict, main_context, eventloop);
 
-	/* associate our GMainContext with our eventloop. */
-	mowgli_eventloop_set_data(eventloop, main_context);
+	/* associate our GMainLoop with our eventloop. */
+	mowgli_eventloop_set_data(eventloop, mainloop);
 }
 
 mowgli_eventloop_t *
