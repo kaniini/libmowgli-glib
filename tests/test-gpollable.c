@@ -49,7 +49,7 @@ static void test_base_loop(void)
 
 static void timer_tick_mowgli(gpointer data)
 {
-	mowgli_eventloop_t *eventloop = data;
+	mowgli_eventloop_t *eventloop = (mowgli_eventloop_t *) data;
 	static gint counter = 0;
 
 	g_print("timer ticked %d times\n", ++counter);
