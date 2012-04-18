@@ -120,5 +120,9 @@ mowgli_glib_get_eventloop(GMainLoop *mainloop)
 	main_context = g_main_loop_get_context(mainloop);
 	return_val_if_fail(main_context != NULL, NULL);
 
+	/* we have to do this because glib doesn't allow you to attach data to a GMainContext */
+	if (mainloop_dict == NULL)
+		mainloop_dict = mowgli_dictionary_create(compare_pointer);
+
 	return mowgli_dictionary_retrieve(mainloop_dict, main_context);
 }
