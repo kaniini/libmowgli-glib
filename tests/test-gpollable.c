@@ -24,27 +24,62 @@
 #include <mowgli-glib.h>
 
 GMainLoop *mainloop;
+mowgli_eventloop_t *eventloop;
 
-static void timer_tick(gpointer unused)
+static void timer_tick_glib(gpointer unused)
 {
 	static gint counter = 0;
 
-	printf("timer ticked %d times\n", ++counter);
+	g_print("timer ticked %d times\n", ++counter);
 
 	if (counter == 5)
 		g_main_loop_quit(mainloop);
 }
 
+static void test_base_loop(void)
+{
+	mowgli_eventloop_timer_t *timer;
+
+	timer = mowgli_timer_add(eventloop, "timer_tick_glib", timer_tick_glib, NULL, 1);
+
+	g_main_loop_run(mainloop);
+
+	mowgli_timer_destroy(eventloop, timer);
+}
+
+static void timer_tick_mowgli(gpointer data)
+{
+	mowgli_eventloop_t *eventloop = data;
+	static gint counter = 0;
+
+	g_print("timer ticked %d times\n", ++counter);
+
+	if (counter == 5)
+		mowgli_eventloop_break(eventloop);
+}
+
+static void test_mowgli_loop(void)
+{
+	mowgli_eventloop_timer_t *timer;
+
+	timer = mowgli_timer_add(eventloop, "timer_tick_mowgli", timer_tick_mowgli, eventloop, 1);
+
+	g_main_loop_run(mainloop);
+
+	mowgli_timer_destroy(eventloop, timer);
+}
+
 int main(int argc, const char *argv[])
 {
-	mowgli_eventloop_t *eventloop;
-
 	mainloop = g_main_loop_new(NULL, FALSE);
 
 	mowgli_glib_init(mainloop, NULL);
 	eventloop = mowgli_glib_get_eventloop(mainloop);
 
-	mowgli_timer_add(eventloop, "timer_tick", timer_tick, NULL, 1);
+	printf("test glib driven loop\n");
+	test_base_loop();
 
-	g_main_loop_run(mainloop);
+	printf("test mowgli eventloop manipulation functions\n");
+	test_mowgli_loop();
 }
+
