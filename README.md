@@ -34,7 +34,7 @@ int main(int argc, const char *argv[])
 {
 	GMainLoop *mainloop;
 
-	mainloop = g_main_loop_new();
+	mainloop = g_main_loop_new(NULL, FALSE);
 	mowgli_glib_init(mainloop, NULL);
 
 	g_main_loop_run(mainloop);
@@ -54,7 +54,7 @@ int main(int argc, const char *argv[])
 	GMainLoop *mainloop;
 	mowgli_eventloop_t *eventloop;
 
-	mainloop = g_main_loop_new();
+	mainloop = g_main_loop_new(NULL, FALSE);
 
 	mowgli_glib_init(mainloop, NULL);
 	eventloop = mowgli_glib_get_eventloop(mainloop);
