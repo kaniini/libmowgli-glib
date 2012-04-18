@@ -24,7 +24,6 @@
 #include <mowgli-glib.h>
 
 GMainLoop *mainloop;
-GMainContext *context;
 
 static void timer_tick(gpointer unused)
 {
@@ -40,8 +39,7 @@ int main(int argc, const char *argv[])
 {
 	mowgli_eventloop_t *eventloop;
 
-	context = g_main_context_default();
-	mainloop = g_main_loop_new(context, FALSE);
+	mainloop = g_main_loop_new(NULL, FALSE);
 
 	mowgli_glib_init(mainloop, NULL);
 	eventloop = mowgli_glib_get_eventloop(mainloop);
