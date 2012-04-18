@@ -3,7 +3,7 @@ include ../extra.mk
 LIB_MAJOR = 0
 LIB_MINOR = 0
 
-PROG = test-gpollable
+PROG_NOINST = test-gpollable
 
 SRCS = test-gpollable.c
 
