@@ -29,5 +29,6 @@
 
 extern gboolean mowgli_glib_init(GMainLoop *mainloop, mowgli_eventloop_t *eventloop);
 extern mowgli_eventloop_t *mowgli_glib_get_eventloop(GMainLoop *mainloop);
+extern mowgli_eventloop_t *mowgli_glib_get_eventloop_default(void);
 
 #endif
