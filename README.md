@@ -28,7 +28,6 @@ following example code as a general idea of how you should go about doing it:
 
 ```C
 #include <mowgli-glib.h>
-#include <glib.h>
 
 int main(int argc, const char *argv[])
 {
@@ -44,6 +43,8 @@ int main(int argc, const char *argv[])
 You can then attach Mowgli eventing primitives to it, like so:
 
 ```C
+#include <mowgli-glib.h>
+
 static void timer_tick(gpointer unused)
 {
 	printf("timer ticked\n");
