@@ -10,6 +10,6 @@ PKG_CHECK_MODULES(GLIB, [glib-2.0 gobject-2.0])
 BUILDSYS_SHARED_LIB
 BUILDSYS_INIT
 BUILDSYS_TOUCH_DEPS
-AC_CONFIG_FILES([buildsys.mk extra.mk])
+AC_CONFIG_FILES([buildsys.mk extra.mk libmowgli-glib.pc])
 AC_CONFIG_HEADERS([config.h])
 AC_OUTPUT
