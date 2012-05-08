@@ -3,8 +3,8 @@ include extra.mk
 LIB_MAJOR = 0
 LIB_MINOR = 0
 
-SHARED_LIB = libmowgli-glib.a
-STATIC_LIB = ${LIB_PREFIX}mowgli-glib${LIB_SUFFIX}
+STATIC_LIB = libmowgli-glib.a
+SHARED_LIB = ${LIB_PREFIX}mowgli-glib${LIB_SUFFIX}
 
 DISTCLEAN = config.h
 
